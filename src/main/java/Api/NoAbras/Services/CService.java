@@ -1,4 +1,4 @@
-package Api.NoAbras.Service;
+package Api.NoAbras.Services;
 
 import Api.NoAbras.Model.CModel;
 import Api.NoAbras.Repository.IRepository;
@@ -7,14 +7,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @Service
 public class CService {
     @Autowired
 
-    private IRepository iRepository;
+    static IRepository iRepository;
 
     public void createStory(CModel model) {
         iRepository.save(model);
@@ -27,9 +26,8 @@ public class CService {
 
     }
 
-    public Optional<CModel> readStoryId(Long id) {
-        Optional<CModel> model = iRepository.findById(id);
-        return model;
+    public CModel readStoryId(Long id) {
+        return iRepository.findById(id).orElse(null);
     }
 
     public void updateStory(CModel model, Long id) {
@@ -40,7 +38,6 @@ public class CService {
 
     public void deleteStory(Long id) {
         iRepository.deleteById(id);
-
 
     }
 
