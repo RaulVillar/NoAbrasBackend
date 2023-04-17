@@ -15,8 +15,8 @@ public class CService {
 
     static IRepository iRepository;
 
-    public void createStory(CModel model) {
-        iRepository.save(model);
+    public CModel createStory(CModel model) {
+        return iRepository.save(model);
 
     }
 

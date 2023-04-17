@@ -12,6 +12,7 @@ import lombok.*;
 @Table(name= "data")
 public class CModel {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column (name = "id", nullable = false)
