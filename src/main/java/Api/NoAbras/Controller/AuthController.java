@@ -5,20 +5,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
+import org.springframework.web.bind.annotation.*;
 
 import Api.NoAbras.Model.ERole;
 import Api.NoAbras.Model.Role;
@@ -31,6 +32,8 @@ import Api.NoAbras.Repository.RoleRepository;
 import Api.NoAbras.Repository.UserRepository;
 import Api.NoAbras.Security.jwt.JwtUtils;
 import Api.NoAbras.Security.service.UserDetailsImpl;
+
+
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -128,4 +131,14 @@ public class AuthController {
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
+    @RequestMapping(value="/logout", method= RequestMethod.GET)
+    public ResponseEntity<MessageResponse> logoutPage(HttpServletRequest request, HttpServletResponse response) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null){
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        return ResponseEntity.ok(new MessageResponse("Logout"));
+    }
+
+
 }

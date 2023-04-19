@@ -57,4 +57,12 @@ public class JwtUtils {
 
         return false;
     }
+    public Date getTokenExpiryFromJWT(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey("HelloWorld")
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.getExpiration();
+    }
 }
