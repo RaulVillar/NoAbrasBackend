@@ -20,12 +20,12 @@ public class CModel {
     private String name;
     @Column (name = "theme", nullable = false)
     private String theme;
-    @Column (name = "description", nullable = false)
+    @Column (name = "description",columnDefinition = "LONGTEXT", nullable = false)
     private String description;
     @Column (name = "location", nullable = false)
     private String location;
-    @Column (name = "url", nullable = false)
-    private String url;
+    @Column (columnDefinition = "LONGTEXT")
+    private String urlImg;
 
 
 
