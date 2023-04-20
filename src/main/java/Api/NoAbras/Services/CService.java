@@ -12,7 +12,6 @@ import java.util.List;
 @Service
 public class CService {
     @Autowired
-
     static IRepository iRepository;
 
     public CModel createStory(CModel model) {

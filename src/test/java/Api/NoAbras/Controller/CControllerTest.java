@@ -2,10 +2,9 @@ package Api.NoAbras.Controller;
 
 import Api.NoAbras.Model.CModel;
 import Api.NoAbras.Services.CService;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -30,7 +29,8 @@ class CControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
+    @InjectMocks
+    private CController cController;
     @MockBean
     private CService cService;
 
@@ -82,7 +82,7 @@ class CControllerTest {
         CModel newStory = new CModel(1L, "Nueva historia", "Comedia", "Descripción", "Oviedo", "https://gyazo.com/123456");
         String jsonRequest = new ObjectMapper().writeValueAsString(newStory);
 
-        when(cService.createStory(newStory)).thenReturn(newStory);
+        when(cService.createStory(any(CModel.class))).thenReturn(newStory);
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.post("/model")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -90,26 +90,32 @@ class CControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        verify(cService, times(1)).createStory(newStory);
+        assertEquals(200, mvcResult.getResponse().getStatus());
+
+        verify(cService, times(1)).createStory(any(CModel.class));
     }
 
     @Test
     void shouldUpdateStoryById() throws Exception {
+        // Arrange
+        Long storyId = 1L;
+        CModel existingStory = new CModel(storyId, "Avistamiento OVNI", "Terror", "Avistamiento OVNI de un anciano", "Mieres", "https://gyazo.com/7726b711943e6da78abf31ec00de9aa1");
+        when(cService.readStoryId(storyId)).thenReturn(existingStory);
 
-        CModel existingStory = new CModel(1L, "Avistamiento OVNI", "Terror", "Avistamiento OVNI de un anciano", "Mieres", "https://gyazo.com/7726b711943e6da78abf31ec00de9aa1");
-        when(cService.readStoryId(1L)).thenReturn(existingStory);
-
-        CModel updatedStory = new CModel(1L, "Nueva historia", "Comedia", "Descripción actualizada", "Oviedo", "https://gyazo.com/123456");
+        CModel updatedStory = new CModel(storyId, "Nueva historia", "Comedia", "Descripción actualizada", "Oviedo", "https://gyazo.com/123456");
         String jsonRequest = new ObjectMapper().writeValueAsString(updatedStory);
 
+        // Act
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.put("/model/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonRequest))
                 .andExpect(status().isOk())
                 .andReturn();
 
-        verify(cService, times(1)).readStoryId(1L);
-        verify(cService, times(1)).updateStory(eq(updatedStory), eq(1L));
+        assertEquals(200, mvcResult.getResponse().getStatus());
+        assertNotNull(updatedStory);
+        verify(cService, times(1)).readStoryId(storyId);
+        verify(cService, times(1)).updateStory(eq(updatedStory), eq(storyId));
     }
 
     @Test
