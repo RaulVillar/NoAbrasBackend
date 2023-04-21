@@ -12,38 +12,48 @@ import java.util.Optional;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/model")
+
+
 public class CController {
     @Autowired
     CService cService;
 
     @GetMapping("")
-    public List<CModel> readConsultation(){
-        return cService.readConsultation();
-    }
+    public List<CModel> readStory() {
+        return cService.readStory();
 
-    @PostMapping("")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public void createConsultation(@RequestBody CModel model){
-        cService.createConsultation(model);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Optional<CModel> readConsultationId(@PathVariable("id") Long id){
-        return cService.readConsultationId(id);
+    public CModel readStoryId(@PathVariable("id") Long id) {
+        return cService.readStoryId(id);
+
     }
 
+    @PostMapping("")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public void createStory(@RequestBody CModel model) {
+        cService.createStory(model);
+
+    }
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void updateConsultation(@RequestBody CModel model,@PathVariable("id")Long id){
-        cService.updateConsultation(model,id);
+    public void updateStory(@RequestBody CModel model, @PathVariable("id") Long id) {
+        cService.updateStory(model, id);
+
     }
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public void deleteConsultation(@PathVariable("id")Long id){
-        cService.deleteConsultation(id);
+    public void deleteStory(@PathVariable("id") Long id) {
+        cService.deleteStory(id);
+
+
     }
+
+
 
 }
 

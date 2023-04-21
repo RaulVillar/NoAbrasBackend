@@ -27,9 +27,6 @@ public class CModel {
     @Column (columnDefinition = "LONGTEXT")
     private String urlImg;
 
-
-
-
 }
 
 

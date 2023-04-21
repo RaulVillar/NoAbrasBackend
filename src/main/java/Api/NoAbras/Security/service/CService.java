@@ -12,38 +12,33 @@ import java.util.Optional;
 @Service
 public class CService {
     @Autowired
-    private IRepository iRepository;
+    public static IRepository iRepository;
 
-
-    public void createConsultation(CModel model){
-        iRepository.save(model);
+    public CModel createStory(CModel model) {
+        return iRepository.save(model);
 
     }
 
-    public List<CModel>readConsultation(){
+    public List<CModel> readStory() {
         List<CModel> models = new ArrayList<CModel>(iRepository.findAll());
         return models;
 
     }
 
-    public Optional<CModel> readConsultationId(Long id){
-        Optional<CModel> model = iRepository.findById(id);
-        return model;
+    public CModel readStoryId(Long id) {
+        return iRepository.findById(id).orElse(null);
     }
 
-    public void updateConsultation(CModel model, Long id){
+    public void updateStory(CModel model, Long id) {
         model.setId(id);
         iRepository.save(model);
 
     }
 
-    public void deleteConsultation(Long id){
+    public void deleteStory(Long id) {
         iRepository.deleteById(id);
+
     }
 
-
-    public void setiRepository(IRepository iRepository) {
-        this.iRepository = iRepository;
-    }
 }
 
