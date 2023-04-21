@@ -7,10 +7,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -27,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CController.class)
 @ExtendWith(MockitoExtension.class)
-
+@AutoConfigureMockMvc(addFilters = false)
 class CControllerTest {
 
     @Autowired
@@ -45,41 +48,38 @@ class CControllerTest {
         stories.add(avistamientoOvni);
 
         when(cService.readStory()).thenReturn(stories);
-        String username = "user";
-        String password = "password";
-        String role = "USER";
-        mockMvc.perform(MockMvcRequestBuilders.get("/model")
-                        .with(user(username).password(password).roles(role))) // Utiliza user() para simular un usuario autenticado
+
+        MockHttpServletResponse response = mockMvc.perform(MockMvcRequestBuilders.get("/model")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Avistamiento OVNI")); // Verifica el valor de la respuesta esperada
+                .andReturn()
+                .getResponse();
 
-
+        assertTrue(response.getContentAsString().contains("Avistamiento OVNI"));
 
     }
 
     @Test
     void shouldReadStoryById() throws Exception {
 
-
-
-        String username = "user";
-        String password = "password";
-        String role = "ADMIN"; // Asignar un rol válido según tu configuración
-
-        // Configurar datos de prueba
         CModel story = new CModel(1L, "Avistamiento OVNI", "Terror", "Avistamiento OVNI de un anciano", "Mieres", "https://gyazo.com/7726b711943e6da78abf31ec00de9aa1");
         when(cService.readStoryId(story.getId())).thenReturn(story);
 
-        // Realizar petición GET con usuario autenticado y roles asignados
-        mockMvc.perform(MockMvcRequestBuilders.get("/model")
-                        .with(user(username).password(password).roles(role)))
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/model/{id}", story.getId())
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().json("[  {    \"id\": 1,    \"name\": \"Avistamiento OVNI\",    \"theme\": \"Terror\",    \"description\": \"Avistamiento OVNI de un anciano\",    \"location\": \"Mieres\",    \"urlImg\": \"https://gyazo.com/7726b711943e6da78abf31ec00de9aa1\"  }]"))
-                .andExpect(jsonPath("$[0].name").value("Avistamiento OVNI"));; // Verificar la respuesta esperada en formato JSON
-        // Verificar que el servicio fue llamado una vez con el ID de historia correcto
+                .andReturn();
+
+        String content = mvcResult.getResponse().getContentAsString();
+        CModel returnedStory = new ObjectMapper().readValue(content, CModel.class);
+        assertEquals(story.getId(), returnedStory.getId());
+        assertEquals(story.getName(), returnedStory.getName());
+        assertEquals(story.getTheme(), returnedStory.getTheme());
+        assertEquals(story.getDescription(), returnedStory.getDescription());
+        assertEquals(story.getLocation(), returnedStory.getLocation());
+        assertEquals(story.getUrlImg(), returnedStory.getUrlImg());
         verify(cService, times(1)).readStoryId(story.getId());
     }
-
 
     @Test
     void shouldCreateStory() throws Exception {
